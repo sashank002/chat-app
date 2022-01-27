@@ -9,6 +9,14 @@ const {
   generateLocationMessage,
 } = require("./utils/messages");
 
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+} = require("./utils/users");
+const { use } = require("express/lib/router");
+
 const app = express();
 const server = http.createServer(app); // just refectoring
 const io = socketio(server); // this line will make sure that our server will support websocket
@@ -38,32 +46,88 @@ io.on("connection", (socket) => {
   //   io.emit("countUpdated", count); // this will emits the event to the all connected clients.
   // });
 
-  socket.emit("message", generateMessage("welcome ! 😎")); // generateMessage will return an object with all required data
+  // socket.emit("message", generateMessage("welcome ! 😎")); // generateMessage will return an object with all required data
 
   // notify another connected user that a new user has been joined
-  socket.broadcast.emit("message", generateMessage("A new user has joined !")); // socket.broadcase.emit emits an event to all the client except current one.
+  // socket.broadcast.emit("message", generateMessage("A new user has joined !")); // socket.broadcase.emit emits an event to all the client except current one.
+
+  //   Very important 🔴🔴
+  //   io.emit ==> emit an event to everyone (for all)
+  //   io.to.emit ==> emit an event to everyone in the room only (for room )
+  //  socket.broadcast.emit ==> emit an event to everyone except current one (for all)
+  //  socket.broadcast.to.emit ==> emit an event to everyone except current one in the room only (for room)
+
+  // this is for when a user join a room
+  socket.on("join", ({ username, room }, callback) => {
+    // add user to user array in specific room
+    const { error, user } = addUser({ id: socket.id, username, room });
+
+    if (error) {
+      return callback(error);
+    }
+
+    socket.join(user.room); // for joining a room
+
+    // for sending greeting msg to new joined user
+    socket.emit("message", generateMessage("Admin", "welcome ! 😎"));
+
+    // for sending msg to the users who are already in the room  that new user has joined in the room
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        "message",
+        generateMessage("Admin", `${user.username} has joined !`)
+      );
+
+    // for updating the user list on sidebar
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
+
+    callback();
+  });
 
   // receiving msg send by client
   socket.on("sendMessage", (msg, callback) => {
+    const user = getUser(socket.id);
     // if there is bad words in message then we don't send message
     const filter = new Filter();
     if (filter.isProfane(msg)) {
       return callback("Profanity is not allowed");
     }
 
-    io.emit("message", generateMessage(msg)); // displaying msg to all connected clients
+    io.to(user.room).emit("message", generateMessage(user.username, msg)); // displaying msg to all connected clients
     callback(); //acknowledgement
   });
 
   // for doing something when client disconnect (close the tab)
   socket.on("disconnect", () => {
-    io.emit("message", generateMessage("A user has left !"));
+    const user = removeUser(socket.id);
+
+    // if there was a user joined the room then this if will run
+    if (user) {
+      // send msg to everyone in the room that specific user has left the room
+      io.to(user.room).emit(
+        "message",
+        generateMessage("Admin", `${user.username} has left  !`)
+      );
+
+      // for updating the user list on sidebar
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
+    }
   });
 
   socket.on("sendLocation", (obj, callback) => {
-    io.emit(
+    const user = getUser(socket.id);
+
+    io.to(user.room).emit(
       "messageLocation",
       generateLocationMessage(
+        user.username,
         `https://google.com/maps?q=${obj.latitude},${obj.longitude}`
       )
     );

@@ -9,24 +9,68 @@ const messages = document.querySelector("#messages");
 // templates
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 const locationTemplate = document.querySelector("#location-template").innerHTML;
+const sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
+
+// Options
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true, // ignore Question mark (?)
+}); // this will return object which have key-value pairs like here we get {username:"",room:""}
+
+const autoScroll = () => {
+  // new Message element
+  const newMessage = messages.lastElementChild;
+
+  //Height of the new message
+  const newMessageStyles = getComputedStyle(newMessage);
+  // console.log(newMessageStyles);
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+
+  const newMessageHeight = newMessage.offsetHeight + newMessageMargin;
+  console.log(newMessageHeight);
+
+  // visible height
+  const visibleHeight = messages.offsetHeight;
+
+  // Height of message container
+  const containerHeight = messages.scrollHeight;
+
+  // How fat have i scrolled ?
+  const scrollOffset = (messages.scrollTop + visibleHeight) * 2;
+
+  if (containerHeight - newMessageHeight < scrollOffset) {
+    messages.scrollTop = messages.scrollHeight;
+  }
+};
 
 socket.on("message", (message) => {
   console.log(message);
   // rendering dynaic elements(messages)
   const html = Mustache.render(messageTemplate, {
+    username: message.username,
     message: message.text,
     createdAt: moment(message.createdAt).format("h:mm a"), // formatting date with moment.js
   });
   messages.insertAdjacentHTML("beforeend", html);
+  autoScroll();
 });
 
 socket.on("messageLocation", (obj) => {
   console.log(obj);
   const html = Mustache.render(locationTemplate, {
+    username: obj.username,
     url: obj.url,
     createdAt: moment(obj.createdAt).format("h:mm a"),
   });
   messages.insertAdjacentHTML("beforeend", html);
+});
+
+socket.on("roomData", ({ room, users }) => {
+  const html = Mustache.render(sidebarTemplate, {
+    room,
+    users,
+  });
+
+  document.querySelector("#sidebar").innerHTML = html;
 });
 
 // message from input field
@@ -85,6 +129,14 @@ sendLocationBtn.addEventListener("click", (e) => {
     );
   });
 });
+
+socket.emit("join", { username, room }, (error) => {
+  // if there is error while joining the room
+  if (error) {
+    alert(error);
+    location.href = "/"; // push back to home page
+  }
+}); // sending username and room data to the server
 
 // ----------temp code for count example ----------------
 // socket.on("countUpdated", (count) => {
