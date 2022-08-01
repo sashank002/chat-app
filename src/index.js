@@ -57,81 +57,175 @@ io.on("connection", (socket) => {
   //  socket.broadcast.emit ==> emit an event to everyone except current one (for all)
   //  socket.broadcast.to.emit ==> emit an event to everyone except current one in the room only (for room)
 
-  // this is for when a user join a room
-  socket.on("join", ({ username, room }, callback) => {
-    // add user to user array in specific room
-    const { error, user } = addUser({ id: socket.id, username, room });
+  // 🔴🏮 OLD CODE
+  // // this is for when a user join a room
+  // socket.on("join", ({ username, room }, callback) => {
+  //   // add user to user array in specific room
+  //   const { error, user } = addUser({ id: socket.id, username, room });
 
+  //   if (error) {
+  //     return callback(error);
+  //   }
+
+  //   socket.join(user.room); // for joining a room
+
+  //   // for sending greeting msg to new joined user
+  //   socket.emit("message", generateMessage("Admin", "welcome ! 😎"));
+
+  //   // for sending msg to the users who are already in the room  that new user has joined in the room
+  //   socket.broadcast
+  //     .to(user.room)
+  //     .emit(
+  //       "message",
+  //       generateMessage("Admin", `${user.username} has joined !`)
+  //     );
+
+  //   // for updating the user list on sidebar
+  //   io.to(user.room).emit("roomData", {
+  //     room: user.room,
+  //     users: getUsersInRoom(user.room),
+  //   });
+
+  //   callback();
+  // });
+
+  // // receiving msg send by client
+  // socket.on("sendMessage", (msg, callback) => {
+  //   const user = getUser(socket.id);
+  //   // if there is bad words in message then we don't send message
+  //   const filter = new Filter();
+  //   if (filter.isProfane(msg)) {
+  //     return callback("Profanity is not allowed");
+  //   }
+
+  //   io.to(user.room).emit("message", generateMessage(user.username, msg)); // displaying msg to all connected clients
+  //   callback(); //acknowledgement
+  // });
+
+  // // for doing something when client disconnect (close the tab)
+  // socket.on("disconnect", () => {
+  //   const user = removeUser(socket.id);
+
+  //   // if there was a user joined the room then this if will run
+  //   if (user) {
+  //     // send msg to everyone in the room that specific user has left the room
+  //     io.to(user.room).emit(
+  //       "message",
+  //       generateMessage("Admin", `${user.username} has left  !`)
+  //     );
+
+  //     // for updating the user list on sidebar
+  //     io.to(user.room).emit("roomData", {
+  //       room: user.room,
+  //       users: getUsersInRoom(user.room),
+  //     });
+  //   }
+  // });
+
+  // socket.on("sendLocation", (obj, callback) => {
+  //   const user = getUser(socket.id);
+
+  //   io.to(user.room).emit(
+  //     "messageLocation",
+  //     generateLocationMessage(
+  //       user.username,
+  //       `https://google.com/maps?q=${obj.latitude},${obj.longitude}`
+  //     )
+  //   );
+  //   callback();
+  // });
+
+  // 🔴🔴 NEW CODE
+
+  let defaultSender = "Room";
+  console.log("New Socket is connected");
+
+  socket.on("join", (options, callback) => {
+    const { error, user } = addUser({ id: socket.id, ...options });
     if (error) {
       return callback(error);
     }
+    socket.join(user.room);
 
-    socket.join(user.room); // for joining a room
-
-    // for sending greeting msg to new joined user
-    socket.emit("message", generateMessage("Admin", "welcome ! 😎"));
-
-    // for sending msg to the users who are already in the room  that new user has joined in the room
+    socket.emit("message", generateMessage("Joined🥳", defaultSender));
     socket.broadcast
       .to(user.room)
       .emit(
         "message",
-        generateMessage("Admin", `${user.username} has joined !`)
+        generateMessage(`${user.username} has joined😃`, defaultSender),
+        user.username
       );
 
-    // for updating the user list on sidebar
-    io.to(user.room).emit("roomData", {
+    io.to(user.room).emit("roomMembers", {
       room: user.room,
-      users: getUsersInRoom(user.room),
+      members: getUsersInRoom(user.room),
     });
-
     callback();
   });
 
-  // receiving msg send by client
   socket.on("sendMessage", (msg, callback) => {
-    const user = getUser(socket.id);
-    // if there is bad words in message then we don't send message
     const filter = new Filter();
     if (filter.isProfane(msg)) {
-      return callback("Profanity is not allowed");
+      return callback("Profanity isn't allowed! (Bad W*rd)");
     }
 
-    io.to(user.room).emit("message", generateMessage(user.username, msg)); // displaying msg to all connected clients
-    callback(); //acknowledgement
+    const { username, room } = getUser(socket.id);
+    socket.emit("message", generateMessage(msg, "me"));
+    socket.broadcast.to(room).emit("message", generateMessage(msg, username));
+    // io.to(room).emit("message", generateMessage(msg, username));
+    callback();
   });
-
-  // for doing something when client disconnect (close the tab)
-  socket.on("disconnect", () => {
-    const user = removeUser(socket.id);
-
-    // if there was a user joined the room then this if will run
-    if (user) {
-      // send msg to everyone in the room that specific user has left the room
-      io.to(user.room).emit(
-        "message",
-        generateMessage("Admin", `${user.username} has left  !`)
-      );
-
-      // for updating the user list on sidebar
-      io.to(user.room).emit("roomData", {
-        room: user.room,
-        users: getUsersInRoom(user.room),
-      });
-    }
-  });
-
-  socket.on("sendLocation", (obj, callback) => {
-    const user = getUser(socket.id);
-
-    io.to(user.room).emit(
-      "messageLocation",
-      generateLocationMessage(
-        user.username,
-        `https://google.com/maps?q=${obj.latitude},${obj.longitude}`
+  socket.on("sendLocation", ({ latitude, longitude }, callback) => {
+    const { username, room } = getUser(socket.id);
+    socket.emit(
+      "location",
+      generateMessage(
+        `https://google.com/maps/?q=${latitude},${longitude}`,
+        "me"
       )
     );
+    socket.broadcast
+      .to(room)
+      .emit(
+        "location",
+        generateMessage(
+          `https://google.com/maps/?q=${latitude},${longitude}`,
+          username
+        )
+      );
+    // io.to(room).emit(
+    //   "location",
+    //   generateMessage(
+    //     `https://google.com/maps/?q=${latitude},${longitude}`,
+    //     username
+    //   )
+    // );
     callback();
+    io.to(room).emit("mapbox", { latitude, longitude });
+    socket.emit("mapboxSet");
+  });
+  socket.on("sendImage", (file, callback) => {
+    const { username, room } = getUser(socket.id);
+
+    socket.emit("image", generateMessage(file, "me"));
+    socket.broadcast.to(room).emit("image", generateMessage(file, username));
+    // io.to(room).emit("image", generateMessage(file, username));
+
+    callback();
+  });
+
+  socket.on("disconnect", () => {
+    const user = removeUser(socket.id);
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        generateMessage(`${user.username} has left😟`, defaultSender)
+      );
+      io.to(user.room).emit("roomMembers", {
+        room: user.room,
+        members: getUsersInRoom(user.room),
+      });
+    }
   });
 });
 

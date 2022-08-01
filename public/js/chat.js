@@ -1,151 +1,350 @@
 const socket = io();
 
-const messageForm = document.querySelector("#message-form");
-const messageFormInput = messageForm.querySelector("input");
-const messageFormButton = messageForm.querySelector("button");
-const sendLocationBtn = document.querySelector("#send-location");
-const messages = document.querySelector("#messages");
+//Selectors
+const messageForm = document.querySelector("#chattingForm");
+const input = messageForm.querySelector("input");
+const sendBtn = messageForm.querySelector("button");
+const locationBtn = document.querySelector("#sendLocation");
+const chatDiv = document.querySelector(".chat-messages");
+const imageUploadIcon = document.querySelector("#fileLabel");
+const iconImage = document.querySelector("#imgUploadIcon");
+const sendBtnMobile = document.querySelector("#sendBtn-mobile");
 
-// templates
-const messageTemplate = document.querySelector("#message-template").innerHTML;
-const locationTemplate = document.querySelector("#location-template").innerHTML;
-const sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
+input.focus();
 
-// Options
+//QueryString
 const { username, room } = Qs.parse(location.search, {
-  ignoreQueryPrefix: true, // ignore Question mark (?)
-}); // this will return object which have key-value pairs like here we get {username:"",room:""}
+  ignoreQueryPrefix: true,
+});
+const me = username.slice(0, 1).toUpperCase() + username.slice(1);
 
-const autoScroll = () => {
-  // new Message element
-  const newMessage = messages.lastElementChild;
-
-  //Height of the new message
-  const newMessageStyles = getComputedStyle(newMessage);
-  // console.log(newMessageStyles);
-  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
-
-  const newMessageHeight = newMessage.offsetHeight + newMessageMargin;
-  console.log(newMessageHeight);
-
-  // visible height
-  const visibleHeight = messages.offsetHeight;
-
-  // Height of message container
-  const containerHeight = messages.scrollHeight;
-
-  // How fat have i scrolled ?
-  const scrollOffset = (messages.scrollTop + visibleHeight) * 2;
-
-  if (containerHeight - newMessageHeight < scrollOffset) {
-    messages.scrollTop = messages.scrollHeight;
+socket.emit("join", { username, room }, (error) => {
+  if (error) {
+    alert(error);
+    location.href = "/";
   }
-};
+});
 
-socket.on("message", (message) => {
-  console.log(message);
-  // rendering dynaic elements(messages)
-  const html = Mustache.render(messageTemplate, {
-    username: message.username,
-    message: message.text,
-    createdAt: moment(message.createdAt).format("h:mm a"), // formatting date with moment.js
+function autoScroll() {
+  setTimeout(() => {
+    const newMessage = chatDiv.lastChild;
+
+    let messageHeight = newMessage.offsetHeight;
+    let messageStyles = getComputedStyle(newMessage);
+    let fullMessageHeight =
+      parseInt(messageStyles.marginBottom) * 2 + messageHeight;
+
+    const visibleMessageContHeight = chatDiv.offsetHeight + 10;
+    const scrolledDistance = chatDiv.scrollTop + visibleMessageContHeight;
+    const fullChatDivHeight = chatDiv.scrollHeight;
+    console.log(fullMessageHeight);
+    if (fullChatDivHeight - fullMessageHeight <= scrolledDistance) {
+      chatDiv.scrollTop = fullChatDivHeight;
+    }
+  }, 10);
+}
+if (localStorage.getItem("dir") !== []) {
+  const dir = localStorage.getItem("dir");
+  if (dir === "RTL") {
+    input.style.direction = dir;
+  } else if (dir === "LTR") {
+    input.style.direction = dir;
+    input.placeholder = "Message";
+  }
+}
+
+//?Message Template
+class message {
+  constructor(content, time, type = "text", senderName) {
+    const div = document.createElement("div");
+    div.classList.add("message");
+    const info = document.createElement("div");
+    info.classList.add("info");
+    const sender = document.createElement("p");
+    sender.classList.add("sender");
+    if (senderName === "me") {
+      div.classList.add("me");
+      sender.innerText = "me";
+      chatDiv.setAttribute("dir", "LTR");
+    } else {
+      sender.innerText = senderName;
+    }
+
+    info.append(sender);
+    const timeStamp = document.createElement("p");
+    timeStamp.classList.add("timestamp");
+    timeStamp.innerText = moment(time).format("h:mm a");
+    info.append(timeStamp);
+
+    div.append(info);
+    if (type === "text") {
+      const text = document.createElement("p");
+      text.innerText = content;
+      if (
+        content !== "Joined🥳" &&
+        !content.includes("has joined😃") &&
+        !content.includes("has left😟")
+      ) {
+        console.log(content, content !== "Joined");
+        text.setAttribute("dir", localStorage.getItem("dir"));
+      } else {
+        text.setAttribute("dir", "LTR");
+      }
+
+      text.classList.add("message-text");
+      chatDiv.append(div);
+      div.append(text);
+    } else if (type === "location") {
+      const link = document.createElement("a");
+      link.href = content;
+      link.innerText = "Google map";
+      link.setAttribute("target", "_blank");
+
+      div.append(link);
+      chatDiv.append(div);
+    } else if (type === "image") {
+      let img = document.createElement("img");
+      img.classList.add("image-added");
+      let div1 = document.createElement("div");
+      div1.append(img);
+
+      img.src = `data:image/png;base64, ${content}`;
+      div.append(div1);
+      div.classList.add("image-sent-cont");
+      chatDiv.append(div);
+    }
+  }
+}
+const membersMobileDiv = document.querySelector(".mobile-room-members");
+
+function roomMembers(room, members) {
+  const container = document.querySelector(".chat-room");
+  const membersContainer = container.getElementsByClassName("member");
+  const mobileTitle = document.querySelector(".mobile-room-title");
+
+  container.innerHTML = "";
+  membersMobileDiv.innerHTML = "";
+  mobileTitle.innerText = room;
+
+  const title = document.createElement("h1");
+  title.classList.add("room-title");
+  title.innerText = room;
+  container.append(title);
+
+  members.forEach((member) => {
+    const memberSpan = document.createElement("span");
+    memberSpan.classList.add("member");
+    memberSpan.innerText = member.username;
+    container.append(memberSpan);
   });
-  messages.insertAdjacentHTML("beforeend", html);
+  members.forEach((member) => {
+    const memberSpan = document.createElement("span");
+    memberSpan.classList.add("mobile-member");
+    memberSpan.innerText = member.username;
+    membersMobileDiv.append(memberSpan);
+  });
+
+  console.log(membersContainer.length, membersContainer);
+  if (membersContainer.length > 1) {
+    let lastMember = membersContainer[membersContainer.length - 1];
+    console.log(membersContainer);
+    lastMember.classList.add("member-animation");
+  }
+}
+
+const mobileChatRoom = document.querySelector(".chat-room-mobile");
+mobileChatRoom.addEventListener("click", () => {
+  membersMobileDiv.classList.toggle("mobile-room-members-active");
+});
+
+socket.on("message", (msg) => {
+  console.log(msg);
+  new message(msg.text, msg.createdAt, "text", msg.sender);
   autoScroll();
 });
-
-socket.on("messageLocation", (obj) => {
-  console.log(obj);
-  const html = Mustache.render(locationTemplate, {
-    username: obj.username,
-    url: obj.url,
-    createdAt: moment(obj.createdAt).format("h:mm a"),
-  });
-  messages.insertAdjacentHTML("beforeend", html);
+socket.on("location", (link) => {
+  console.log(link);
+  new message(link.text, link.createdAt, "location", link.sender);
+  autoScroll();
+});
+socket.on("image", (file) => {
+  new message(file.text, file.createdAt, "image", file.sender);
+});
+socket.on("roomMembers", ({ room, members }) => {
+  roomMembers(room, members);
 });
 
-socket.on("roomData", ({ room, users }) => {
-  const html = Mustache.render(sidebarTemplate, {
-    room,
-    users,
-  });
+function checkRTL(s) {
+  let ltrChars =
+      "A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF" +
+      "\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF",
+    rtlChars = "\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC",
+    rtlDirCheck = new RegExp("^[^" + ltrChars + "]*[" + rtlChars + "]");
 
-  document.querySelector("#sidebar").innerHTML = html;
-});
+  return rtlDirCheck.test(s);
+}
+//
+input.addEventListener("input", keypress);
 
-// message from input field
+function keypress(e) {
+  function myFunction(x) {
+    if (x.matches) {
+      if (input.value !== "") {
+        sendBtnMobile.classList.add("sendBtn-mobile-active");
+        imageUploadIcon.classList.add("fileLabel-disabled");
+        imageUploadIcon.classList.add("fileLabel-transition-ready");
+      } else {
+        sendBtnMobile.classList.remove("sendBtn-mobile-active");
+        imageUploadIcon.classList.remove("fileLabel-disabled");
+        imageUploadIcon.classList.add("fileLabel-active");
+      }
+    }
+  }
+
+  let x = window.matchMedia("(max-width: 750px)");
+  myFunction(x);
+  x.addListener(myFunction);
+
+  setTimeout(function () {
+    let isRTL = checkRTL(input.value);
+    let dir = isRTL ? "RTL" : "LTR";
+
+    localStorage.setItem("dir", dir);
+    input.style.direction = dir;
+
+    if (e.charCode == 32) dir = "SPACE";
+  }, 0);
+}
+//
 messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
+  sendBtn.setAttribute("disabled", "disabled");
+  sendBtnMobile.setAttribute("disabled", "disabled");
+  sendBtn.classList.add("sendingMessage");
+  sendBtnMobile.classList.add("sendingMessage");
+  input.focus();
 
-  messageFormButton.setAttribute("disabled", "disabled");
-
-  // const message = document.querySelector("input").value;
-  const message = e.target.elements.message.value;
-
-  // console.log(message);
-
-  socket.emit("sendMessage", message, (error) => {
-    // enabling button when message has been send
-    messageFormButton.removeAttribute("disabled");
-
-    //clear input field
-    messageFormInput.value = "";
-
-    //focus on input Field
-    messageFormInput.focus();
-
+  socket.emit("sendMessage", input.value, (error) => {
+    sendBtn.removeAttribute("disabled");
+    sendBtnMobile.removeAttribute("disabled");
+    sendBtnMobile.classList.remove("sendingMessage");
+    sendBtn.classList.remove("sendingMessage");
+    input.value = "";
+    sendBtnMobile.classList.remove("sendBtn-mobile-active");
+    imageUploadIcon.classList.remove("fileLabel-disabled");
+    imageUploadIcon.classList.add("fileLabel-active");
+    console.log("yeeeh");
+    input.focus();
     if (error) {
       return console.log(error);
     }
 
-    console.log("the message was delivered !");
+    console.log("Message delivered!");
   });
 });
 
-sendLocationBtn.addEventListener("click", (e) => {
+locationBtn.addEventListener("click", () => {
   if (!navigator.geolocation) {
-    return alert("geolocation is not supported by your browser");
+    return alert("Geolocation isn't supported by your browser.");
   }
-
-  // disabling button
-  sendLocationBtn.setAttribute("disabled", "disabled");
+  locationBtn.setAttribute("disabled", "disabled");
+  locationBtn.classList.add("sendingLocation");
 
   navigator.geolocation.getCurrentPosition((position) => {
-    const lat = position.coords.latitude;
-    const longg = position.coords.longitude;
-
-    socket.emit(
-      "sendLocation",
-      {
-        latitude: lat,
-        longitude: longg,
-      },
-      () => {
-        // re-enabling buttton
-        sendLocationBtn.removeAttribute("disabled");
-
-        console.log("location shared !");
-      }
-    );
+    // const { latitude, longitude } = position.coords;
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    console.log(latitude, longitude);
+    socket.emit("sendLocation", { latitude, longitude }, () => {
+      locationBtn.removeAttribute("disabled");
+      locationBtn.classList.remove("sendingLocation");
+      console.log("Location link shared!");
+    });
   });
 });
 
-socket.emit("join", { username, room }, (error) => {
-  // if there is error while joining the room
-  if (error) {
-    alert(error);
-    location.href = "/"; // push back to home page
+let counter = 0;
+socket.on("mapbox", ({ latitude, longitude }) => {
+  //?Map Template
+  const mapDiv = document.createElement("div");
+  mapDiv.id = `map${counter}`;
+  mapDiv.classList = "Mapbox-map";
+
+  //?Message Template
+  const div = document.createElement("div");
+  div.classList.add("message");
+
+  div.classList.add("location-message");
+  div.append(mapDiv);
+  chatDiv.append(div);
+
+  //mapbox location
+  const token =
+    "pk.eyJ1Ijoic2FzaGFuazAyIiwiYSI6ImNrdWgwaTU5bjBlNnYycG15czJjczNkY3EifQ.3h9OMJ5fopxZNr1u2MT_pQ";
+  mapboxgl.accessToken = token;
+
+  const map = new mapboxgl.Map({
+    container: `map${counter}`,
+    style: "mapbox://styles/mapbox/streets-v11",
+    center: [longitude, latitude],
+    zoom: 15,
+    pitch: 40,
+  });
+  //mapbox marker
+  new mapboxgl.Marker().setLngLat([longitude, latitude]).addTo(map);
+  socket.on("mapboxSet", () => {
+    console.log("map set to everybody successfully");
+    autoScroll();
+  });
+  counter++;
+});
+//!
+
+const inputElement = document.querySelector('input[type="file"]');
+
+inputElement.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  console.log(file);
+  function removeClass() {
+    imageUploadIcon.classList.add("fileUpload-active");
+    setTimeout(() => {
+      imageUploadIcon.classList.remove("fileUpload-active");
+    }, 700);
   }
-}); // sending username and room data to the server
+  if (file.size > 10000000) {
+    removeClass();
+    return console.log("File is too big");
+  } else if (!file.type.includes("image")) {
+    removeClass();
+    return console.log("Please insert an image");
+  }
+  iconImage.classList.add("progress-Image");
 
-// ----------temp code for count example ----------------
-// socket.on("countUpdated", (count) => {
-//   // when countUpdated event occurs ,this callback will run
-//   console.log("Count has been updated !", count);
-// });
+  imageUploadIcon.classList.add("imageUploadIcon-active");
+  sendBtnMobile.classList.add("imageUploadIcon-active2");
+  const compress = new Compress();
+  compress
+    .compress([...e.target.files], {
+      size: 4, // the max size in MB, defaults to 2MB
+      quality: 0.65, // the quality of the image, max is 1,
+      maxWidth: 1920, // the max width of the output image, defaults to 1920px
+      maxHeight: 1920, // the max height of the output image, defaults to 1920px
+      resize: true, // defaults to true, set false if you do not want to resize the image width and height
+    })
+    .then((file) => {
+      console.log("Processed");
+      socket.emit("sendImage", file[0].data, () => {
+        iconImage.classList.remove("progress-Image");
+        sendBtnMobile.classList.remove("imageUploadIcon-active2");
+        imageUploadIcon.classList.remove("imageUploadIcon-active");
+        console.log("image sent!!");
 
-// document.querySelector("#increment").addEventListener("click", () => {
-//   console.log("clicked");
+        autoScroll();
+      });
+    });
+});
+//!
+const inputChatIcons = document.querySelector("#chattingForm .div input");
+console.log(inputChatIcons);
 
-//   socket.emit("increment"); // send an "increment" event to the server side for incrementing count
-// });
+new emojiLibrary(inputChatIcons);

@@ -1,0 +1,611 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Rubik", "El Messiri", sans-serif;
+    scrollbar-width: thin;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .chat-room {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+  }
+  .member,
+  .room-title {
+    color: white;
+    font-size: calc(0.8rem + 1vw);
+    background: rgba(35, 140, 238, 0.03);
+    width: 100%;
+    text-align: center;
+    padding: calc(0.3rem + 1vw);
+    font-family: "Poppins";
+  }
+  .room-title {
+    background: #F2AA4CFF;
+    padding: calc(1.2rem + 1vw) 0;
+    font-size: calc(1.1rem + 1vw);
+  }
+  .member-animation {
+    animation: member-added 0.1s ease-in-out forwards;
+  }
+  
+  @keyframes member-added {
+    from {
+      font-size: calc(0.7rem + 1vw);
+      opacity: 0.9;
+      padding: calc(0.2rem + 1vw);
+    }
+    to {
+      font-size: calc(0.8rem + 1vw);
+      padding: calc(0.3rem + 1vw);
+    }
+  }
+  a {
+    color: rgb(56, 56, 56);
+  }
+  html {
+    font-size: 62.5%;
+  }
+  #title {
+    text-align: center;
+    padding: 2.4rem 0rem;
+    font-size: 4.5rem;
+    color: #F2AA4CFF;
+  }
+  .message-text {
+    word-wrap: break-word;
+  }
+  .message {
+    max-width: 40vw;
+    border-radius: 2rem;
+    display: inline-block;
+    margin: 1rem 0;
+    padding: 0.9rem 1.8rem;
+    background: #F2AA4CFF;
+    font-size: calc(0.8rem + 1vw);
+    color: white;
+  }
+  .Mapbox-map {
+    width: 400px;
+    height: 300px;
+    border-radius: 2rem;
+  }
+  .location-message {
+    padding: 1rem;
+  }
+  .chat-messages {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+    padding: calc(1rem + 1.7vh) calc(2rem + 2vw);
+    flex: 1 1 20rem;
+    overflow-y: scroll;
+  }
+  #fileInput {
+    display: none;
+  }
+  .settings-mobile {
+    display: none;
+  }
+  .fileUpload-active {
+    animation: errorUploading 0.05s alternate 0.2s;
+    animation-iteration-count: 10;
+    background: #ec3d3d !important;
+    transition: 0.4s ease-in-out;
+  }
+  .image-added {
+    width: 100%;
+    max-width: 450px;
+    object-fit: contain;
+    height: 100%;
+    max-height: 450px;
+    border-radius: 2rem;
+    border-top-left-radius: 0;
+  }
+  .timestamp {
+    font-size: calc(0.2rem + 1vw);
+    font-weight: 300;
+    color: #777777;
+  }
+  .sender {
+    font-size: calc(0.3rem + 1vw);
+    margin-right: calc(0.1rem + 0.5vw);
+  
+    color: #333333;
+  }
+  .info {
+    margin-bottom: 0.6rem;
+  }
+  @keyframes errorUploading {
+    from {
+      transform: translateX(-7%);
+    }
+    to {
+      transform: translateX(7%);
+    }
+  }
+  .chat-cont {
+    max-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .chat-room {
+    flex: 0.5 0.5 30rem;
+    background: #101820FF;
+    height: 100vh;
+    overflow-y: scroll;
+  }
+  .chat {
+    flex: 1 1 90rem;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 13vh;
+    padding: 0.5rem 0;
+    background: #f0f0f0;
+  }
+  .logo {
+    height: 100%;
+    width: 15%;
+  }
+  .logo svg {
+    width: 100%;
+    height: 100%;
+  }
+  .form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: calc(1rem + 1.6vh) 0;
+  }
+  #chattingForm {
+    margin-left: calc(2rem + 2vw);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #chattingForm input {
+    flex: 1 1 30rem;
+    margin-right: 1rem;
+    padding: 1.2rem 1.7rem;
+    border-radius: 0.6rem;
+    border: none;
+    background: #ebebeb;
+    font-size: calc(0.7rem + 1vw);
+    padding-right: 5rem;
+  }
+  #chattingForm button {
+    height: 100%;
+  }
+  #chattingForm button,
+  #sendLocation {
+    margin-right: 1rem;
+    padding: 1.5rem 3rem;
+    border-radius: 0.6rem;
+    border: none;
+    background: #101820FF;
+    color: white;
+    font-size: calc(0.4rem + 1vw);
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+  }
+  .put-on-top {
+    position: relative;
+  }
+  #fileLabel {
+    position: relative;
+  }
+  #sendBtn-mobile {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+  }
+  #fileLabel,
+  #sendBtn-mobile {
+    border-radius: 0.6rem;
+    background: #101820FF;
+    padding: 1.4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.05s ease-in-out;
+    margin-right: calc(2rem + 2vw);
+  }
+  #sendLocation {
+    background: #ebebeb !important;
+    color: #101820FF !important;
+    font-size: calc(0.4rem + 1vw) !important;
+    transition: 0.1s ease-in-out !important;
+  }
+  #sendLocation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #sendLocation svg {
+    min-width: 18px;
+    min-height: 19px;
+  }
+  #chattingForm button.sendingMessage {
+    background: #101820FF !important;
+    cursor: unset !important;
+  }
+  #sendLocation.sendingLocation {
+    background: #f7f7f7 !important;
+    cursor: unset !important;
+  }
+  #imgUploadIcon {
+    pointer-events: all;
+    transition: 0.05s ease-in-out;
+    transform: rotate(0deg) translateY(0%);
+  }
+  .progress-Image {
+    animation: rotatingImage 0.4s alternate infinite;
+  }
+  .imageUploadIcon-active {
+    pointer-events: none !important;
+    background: #101820FF !important;
+    cursor: unset !important;
+    transition: 0.5s ease-in-out !important;
+  }
+  .imageUploadIcon-active2 {
+    background: transparent !important;
+  }
+  .info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .settings {
+    position: absolute;
+    right: 4%;
+    top: 4%;
+    width: 3%;
+    cursor: pointer;
+  }
+  .chat-room-mobile {
+    display: none;
+  }
+  .location-message {
+    max-width: unset;
+  }
+  #sendBtn-mobile {
+    display: none;
+  }
+  #imgUploadIcon {
+    transition: unset;
+  }
+  #fileLabel {
+    z-index: 1;
+  }
+  .fileLabel-transition-ready svg {
+    transition: all 0.3s !important;
+  }
+  .fileLabel-active svg {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: all;
+  }
+  button {
+    border: none;
+  }
+  #sendBtn-mobile svg {
+    pointer-events: none;
+    transform: scale(0.7);
+    transition: all 0.3s !important;
+  }
+  .fileLabel-disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #fileLabel.fileLabel-disabled svg {
+    pointer-events: none;
+    transform: rotate(0deg) translateY(0%) scale(0.7);
+  }
+  #sendBtn-mobile svg {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  #sendBtn-mobile.sendBtn-mobile-active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+  }
+  #sendBtn-mobile.sendBtn-mobile-active svg {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+  }
+  .send-image-send-combination {
+    position: relative;
+  }
+  @keyframes rotatingImage {
+    from {
+      transform: translateY(20%);
+    }
+    to {
+      transform: translateY(0%);
+    }
+  }
+  @media screen and (max-width: 1050px) {
+    #sendLocation svg {
+      width: 5px;
+      height: 6px;
+    }
+  }
+  @media screen and (min-width: 1750px) {
+    .image-added {
+      width: 100%;
+      max-width: 700px;
+      object-fit: contain;
+      height: 100%;
+      max-height: 700px;
+    }
+  }
+  @media screen and (max-width: 800px) {
+    .settings {
+      position: absolute;
+      right: 3%;
+      top: 3%;
+      width: 4%;
+    }
+  }
+  @media screen and (max-width: 700px) {
+    .settings {
+      position: absolute;
+      right: 3%;
+      top: 3%;
+      width: 5%;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .settings {
+      position: absolute;
+      right: 4%;
+      top: 4%;
+    }
+  }
+  @media screen and (max-width: 450px) {
+    .settings {
+      position: absolute;
+      right: 4%;
+      top: 4%;
+      width: 6%;
+    }
+    .chat-messages {
+      padding: calc(1rem + 1.7vh) calc(1rem + 2vw);
+    }
+    .message {
+      padding: 1rem 1.8rem;
+    }
+    .location-message {
+      padding: 0.8rem;
+    }
+    .sender {
+      font-size: calc(1rem + 1vw);
+    }
+    .timestamp {
+      font-size: calc(0.9rem + 1vw);
+    }
+  }
+  @media screen and (max-width: 375px) {
+    .settings {
+      position: absolute;
+      right: 4%;
+      top: 4%;
+      width: 7%;
+    }
+  }
+  @media screen and (max-width: 331px) {
+    .settings {
+      position: absolute;
+      right: 4%;
+      top: 4%;
+      width: 8%;
+    }
+  }
+  .mobile-room-title,
+  .mobile-room-members,
+  .mobile-member {
+    display: none;
+  }
+  @media screen and (max-width: 750px) {
+    .mobile-room-title {
+      display: block !important;
+      color: white;
+      text-align: center;
+      font-size: calc(2.2rem + 1vw);
+    }
+    .mobile-room-members {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 88vh;
+      background: rgba(51, 55, 68, 0.99);
+      display: flex !important;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: column;
+      overflow-y: scroll;
+      transform: translateY(-1%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3;
+      transition: 0.2s ease-in-out;
+    }
+    .mobile-room-members-active {
+      transform: translateY(0%);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .mobile-member {
+      color: white;
+      font-family: "Poppins", "ElMessiri", sans-serif;
+      text-align: center;
+      width: 100%;
+      font-size: calc(2.3rem + 1vw);
+      padding: calc(1.9rem + 1vw);
+      background: #323949ca;
+      display: block !important;
+    }
+    .sender {
+      font-size: calc(0.8rem + 1vw);
+    }
+    .timestamp {
+      font-size: calc(0.7rem + 1vw);
+    }
+    .image-sent-cont {
+      max-width: 80%;
+      padding: 0.8rem;
+    }
+    .chat-room {
+      display: none;
+    }
+    .Mapbox-map {
+      width: 260px;
+      height: 195px;
+      border-radius: 1rem;
+    }
+    .message {
+      border-radius: 1rem;
+      font-size: calc(1.7rem + 1vw);
+      max-width: 68vw;
+      padding: 0.7rem 1.4rem;
+    }
+    .location-message {
+      padding: 0.7rem;
+      max-width: unset;
+    }
+    #sendLocation {
+      order: 2;
+      margin-right: calc(1rem + 2vw);
+      border-radius: 1rem;
+      padding: 0.7rem;
+    }
+    #sendLocation svg {
+      width: 27px;
+      height: 28px;
+    }
+    #fileLabel,
+    #sendBtn-mobile {
+      margin-right: 1rem;
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+    #chattingForm input {
+      border-radius: 1rem;
+      font-size: calc(1rem + 1vw);
+      padding: 1.2rem;
+      padding-right: 5.1rem;
+    }
+    #shareSpan,
+    #sendBtn {
+      display: none;
+    }
+    #sendBtn-mobile {
+      display: block;
+    }
+    .logo {
+      display: none;
+    }
+    .chat-room-mobile {
+      cursor: pointer;
+      background: #101820FF;
+      flex: 5 1 20rem;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .settings {
+      display: none;
+    }
+    .nav {
+      padding: unset;
+      justify-content: flex-start;
+      min-height: unset;
+      height: 12vh;
+      z-index: 5;
+    }
+    .settings-mobile {
+      display: block;
+      padding: 2rem;
+    }
+    .settings-mobile svg {
+      width: 28px;
+      height: 28px;
+    }
+    #chattingForm {
+      margin-left: calc(1rem + 2vw);
+    }
+    #imgUploadIcon,
+    #send-mobile-icon {
+      width: 22px;
+      height: 21px;
+    }
+    .message-text {
+      font-size: calc(1.2rem + 1vw);
+    }
+  }
+  @media screen and (max-width: 370px) {
+    #chattingForm input {
+      padding: 1.2rem 0.8rem;
+      padding-right: 0.9rem;
+      padding-right: 3.7rem;
+    }
+    #chattingForm {
+      margin-left: calc(0.3rem + 2vw);
+    }
+    #sendingLocation {
+      margin-right: calc(0.3rem + 2vw);
+    }
+  }
+  .me,
+  .me + .location-message {
+    background: #101820FF;
+    align-self: flex-end;
+    color: white;
+  }
+  
+  .me .sender {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .me .timestamp {
+    color: rgba(255, 255, 255, 0.67);
+  }
+  .me .image-added {
+    border-top-right-radius: 0 !important;
+    border-top-left-radius: 2rem !important;
+  }
+  .me a {
+    color: rgb(255, 255, 255);
+  }
+  .mapboxgl-ctrl-logo,
+  .mapboxgl-ctrl-attrib.mapboxgl-compact {
+    display: none !important;
+  }
+  

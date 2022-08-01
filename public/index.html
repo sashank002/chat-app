@@ -2,25 +2,47 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./client-utils/emoji library/style.css" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/emoji-picker/1.1.5/css/emoji.min.css"
+        integrity="sha512-g85Z5r0tA1tvV9xX6Ox6ZLhJPkX1k0diGsJcVm56Zd++P69y82MJ0qG6BAMeKfHrDWE+0DoFl7TUqEha63u5GA=="
+        crossorigin="anonymous" />
+
+    <link rel="icon" href="./client-utils/images/Group 2.svg" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Poppins:wght@300;400;700&family=Roboto:wght@300;400;700&family=Rubik:wght@300;400;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sat'sChat</title>
+    <style>
+        .mapboxgl-marker-anchor-center svg g {
+            fill: rgb(35, 140, 238) !important;
+        }
+    </style>
+    <link rel="stylesheet" href="./css/index.css" />
 </head>
 
 <body>
-    <div class="centered-form">
-        <div class="centered-form__box">
-            <h1>join</h1>
-            <form action="./chat.html">
-
-                <label for=""> Display name </label>
-                <input type="text" name="username" placeholder="Sashank" required>
-                <label for=""> Room </label>
-                <input type="text" name="room" placeholder="Room" required>
-                <button>Join</button>
-            </form>
+    <div class="cont">
+        <div class="logo">
+            <img src="./client-utils/images/logo.png" alt="" />
         </div>
+        <form action="/chat.html">
+            <label for="displayName">Display name</label>
+            <input type="text" id="displayName" name="username" required />
+            <label for="Room" id="Roomname">Room</label>
+            <input type="text" id="Room" name="room" required />
+            <button id="submit" type="submit">Join!</button>
+        </form>
     </div>
 </body>
 

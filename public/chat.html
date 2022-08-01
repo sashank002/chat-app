@@ -2,90 +2,182 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
-    <link rel="icon" href="./img/favicon.png" />
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./client-utils/emoji library/style.css" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/emoji-picker/1.1.5/css/emoji.min.css"
+        integrity="sha512-g85Z5r0tA1tvV9xX6Ox6ZLhJPkX1k0diGsJcVm56Zd++P69y82MJ0qG6BAMeKfHrDWE+0DoFl7TUqEha63u5GA=="
+        crossorigin="anonymous" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Poppins:wght@300;400;700&family=Roboto:wght@300;400;700&family=Rubik:wght@300;400;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S'Chat</title>
+    <style>
+        .mapboxgl-marker-anchor-center svg g {
+            fill: rgb(35, 140, 238) !important;
+        }
+    </style>
+    <link rel="stylesheet" href="./css/chat.css" />
 </head>
 
 <body>
+    <div class="chat-cont">
+        <div class="chat-room"></div>
+        <div class="chat">
+            <div class="nav">
+                <div class="chat-room-mobile">
+                    <h1 class="mobile-room-title"></h1>
+                </div>
+                <div class="settings-mobile">
+                    <svg width="30px" height="30px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M10.2574 7.8788H1.41175C0.631966 7.8788 0 7.24642 0 6.46705C0 5.68768 0.631966 5.0553 1.41175 5.0553H10.2574C11.0372 5.0553 11.6691 5.68768 11.6691 6.46705C11.6691 7.24642 11.0372 7.8788 10.2574 7.8788Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M15.3122 12.9332C11.7464 12.9332 8.84564 10.0324 8.84564 6.46696C8.84564 2.90078 11.7464 0 15.3122 0C18.8779 0 21.7787 2.90078 21.7787 6.46696C21.7787 10.0325 18.8779 12.9332 15.3122 12.9332ZM15.3122 2.82361C13.3034 2.82361 11.6691 4.45814 11.6691 6.46696C11.6691 8.47577 13.3034 10.1096 15.3122 10.1096C17.321 10.1096 18.9552 8.47577 18.9552 6.46696C18.9552 4.45814 17.321 2.82361 15.3122 2.82361Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M46.5883 7.8788H25.4882C24.7084 7.8788 24.0764 7.24642 24.0764 6.46705C24.0764 5.68768 24.7084 5.0553 25.4882 5.0553H46.5882C47.3679 5.0553 47.9999 5.68768 47.9999 6.46705C47.9999 7.24642 47.368 7.8788 46.5883 7.8788Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M34.2673 29.9928C30.7014 29.9928 27.8008 27.092 27.8008 23.5266C27.8008 19.9611 30.7015 17.0604 34.2673 17.0604C37.8331 17.0604 40.7338 19.9611 40.7338 23.5266C40.7338 27.092 37.8332 29.9928 34.2673 29.9928ZM34.2673 19.884C32.2585 19.884 30.6243 21.5178 30.6243 23.5266C30.6243 25.5354 32.2585 27.1692 34.2673 27.1692C36.2761 27.1692 37.9103 25.5354 37.9103 23.5266C37.9103 21.5178 36.2761 19.884 34.2673 19.884Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M24.0916 24.9383H1.41175C0.631966 24.9383 0 24.3059 0 23.5266C0 22.7472 0.631966 22.1148 1.41175 22.1148H24.0916C24.8714 22.1148 25.5033 22.7472 25.5033 23.5266C25.5033 24.3059 24.8714 24.9383 24.0916 24.9383Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M46.5882 24.9383H39.322C38.5423 24.9383 37.9103 24.3059 37.9103 23.5266C37.9103 22.7472 38.5423 22.1148 39.322 22.1148H46.5882C47.368 22.1148 48 22.7472 48 23.5266C48 24.3059 47.368 24.9383 46.5882 24.9383Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M13.7327 47.0531C10.167 47.0531 7.26617 44.1523 7.26617 40.5861C7.26617 37.0207 10.167 34.1199 13.7327 34.1199C17.2985 34.1199 20.1992 37.0207 20.1992 40.5861C20.1992 44.1523 17.2985 47.0531 13.7327 47.0531ZM13.7327 36.9435C11.7239 36.9435 10.0897 38.5773 10.0897 40.5861C10.0897 42.5949 11.7239 44.2294 13.7327 44.2294C15.7415 44.2294 17.3757 42.5949 17.3757 40.5861C17.3757 38.5773 15.7415 36.9435 13.7327 36.9435Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M46.5882 41.9979H23.9084C23.1286 41.9979 22.4967 41.3656 22.4967 40.5862C22.4967 39.8068 23.1286 39.1744 23.9084 39.1744H46.5882C47.368 39.1744 48 39.8068 48 40.5862C48 41.3656 47.368 41.9979 46.5882 41.9979Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M8.67794 41.998H1.41175C0.631966 41.998 0 41.3656 0 40.5861C0 39.8068 0.631966 39.1744 1.41175 39.1744H8.67794C9.45773 39.1744 10.0897 39.8068 10.0897 40.5861C10.0897 41.3656 9.45773 41.998 8.67794 41.998Z"
+                            fill="#238CEE" />
+                    </svg>
+                </div>
 
-    <div class="chat">
-        <div id="sidebar" class="chat__sidebar">
-
-        </div>
-        <div class="chat__main">
-            <div id="messages" class="chat__messages">
-
+                <div class="settings">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M10.2574 7.8788H1.41175C0.631966 7.8788 0 7.24642 0 6.46705C0 5.68768 0.631966 5.0553 1.41175 5.0553H10.2574C11.0372 5.0553 11.6691 5.68768 11.6691 6.46705C11.6691 7.24642 11.0372 7.8788 10.2574 7.8788Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M15.3122 12.9332C11.7464 12.9332 8.84564 10.0324 8.84564 6.46696C8.84564 2.90078 11.7464 0 15.3122 0C18.8779 0 21.7787 2.90078 21.7787 6.46696C21.7787 10.0325 18.8779 12.9332 15.3122 12.9332ZM15.3122 2.82361C13.3034 2.82361 11.6691 4.45814 11.6691 6.46696C11.6691 8.47577 13.3034 10.1096 15.3122 10.1096C17.321 10.1096 18.9552 8.47577 18.9552 6.46696C18.9552 4.45814 17.321 2.82361 15.3122 2.82361Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M46.5883 7.8788H25.4882C24.7084 7.8788 24.0764 7.24642 24.0764 6.46705C24.0764 5.68768 24.7084 5.0553 25.4882 5.0553H46.5882C47.3679 5.0553 47.9999 5.68768 47.9999 6.46705C47.9999 7.24642 47.368 7.8788 46.5883 7.8788Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M34.2673 29.9928C30.7014 29.9928 27.8008 27.092 27.8008 23.5266C27.8008 19.9611 30.7015 17.0604 34.2673 17.0604C37.8331 17.0604 40.7338 19.9611 40.7338 23.5266C40.7338 27.092 37.8332 29.9928 34.2673 29.9928ZM34.2673 19.884C32.2585 19.884 30.6243 21.5178 30.6243 23.5266C30.6243 25.5354 32.2585 27.1692 34.2673 27.1692C36.2761 27.1692 37.9103 25.5354 37.9103 23.5266C37.9103 21.5178 36.2761 19.884 34.2673 19.884Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M24.0916 24.9383H1.41175C0.631966 24.9383 0 24.3059 0 23.5266C0 22.7472 0.631966 22.1148 1.41175 22.1148H24.0916C24.8714 22.1148 25.5033 22.7472 25.5033 23.5266C25.5033 24.3059 24.8714 24.9383 24.0916 24.9383Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M46.5882 24.9383H39.322C38.5423 24.9383 37.9103 24.3059 37.9103 23.5266C37.9103 22.7472 38.5423 22.1148 39.322 22.1148H46.5882C47.368 22.1148 48 22.7472 48 23.5266C48 24.3059 47.368 24.9383 46.5882 24.9383Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M13.7327 47.0531C10.167 47.0531 7.26617 44.1523 7.26617 40.5861C7.26617 37.0207 10.167 34.1199 13.7327 34.1199C17.2985 34.1199 20.1992 37.0207 20.1992 40.5861C20.1992 44.1523 17.2985 47.0531 13.7327 47.0531ZM13.7327 36.9435C11.7239 36.9435 10.0897 38.5773 10.0897 40.5861C10.0897 42.5949 11.7239 44.2294 13.7327 44.2294C15.7415 44.2294 17.3757 42.5949 17.3757 40.5861C17.3757 38.5773 15.7415 36.9435 13.7327 36.9435Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M46.5882 41.9979H23.9084C23.1286 41.9979 22.4967 41.3656 22.4967 40.5862C22.4967 39.8068 23.1286 39.1744 23.9084 39.1744H46.5882C47.368 39.1744 48 39.8068 48 40.5862C48 41.3656 47.368 41.9979 46.5882 41.9979Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M8.67794 41.998H1.41175C0.631966 41.998 0 41.3656 0 40.5861C0 39.8068 0.631966 39.1744 1.41175 39.1744H8.67794C9.45773 39.1744 10.0897 39.8068 10.0897 40.5861C10.0897 41.3656 9.45773 41.998 8.67794 41.998Z"
+                            fill="#238CEE" />
+                    </svg>
+                </div>
             </div>
+            <div class="mobile-room-members">
+                <!-- <span class="mobile-member">Yassin</span>
+            <span class="mobile-member">Amin</span>
+            <span class="mobile-member">Hend</span> -->
+            </div>
+            <div class="chat-messages"></div>
+            <div class="form-wrapper">
+                <form id="chattingForm">
+                    <div class="div">
+                        <input autocomplete="off" type="text" required="true" name="message" placeholder="message" />
 
-            <div class="compose">
+                        <div class="emoji-icon">🙃</div>
+                        <div class="drawer">
+                            <div class="type">
+                                <img class="historyEmojis emoji-icon-add-one"
+                                    src="./client-utils/emoji library/history.png" alt="" /><span
+                                    class="facesEmojis emoji-icon-add-one">😅</span><span
+                                    class="handsEmojis emoji-icon-add-one">💪</span><span
+                                    class="humansEmojis emoji-icon-add-one">🤦‍♂️</span><span
+                                    class="clothesEmojis emoji-icon-add-one">👗</span><span
+                                    class="natureEmojis emoji-icon-add-one">🌚</span><span
+                                    class="loveEmojis emoji-icon-add-one">❤️</span>
+                                <span class="deleteIcon emoji-icon-add-one"><img
+                                        src="./client-utils/emoji library/delete.png" alt=""
+                                        class="emoji-icon-add-one" /></span>
+                            </div>
+                            <div class="historyEmojisDiv"></div>
+                            <div class="emojis"></div>
+                        </div>
+                    </div>
 
-                <!-- for message  -->
-                <form id="message-form">
-                    <input name="message" type="text" placeholder="message here !" required autocomplete="off">
-                    <button>send</button>
+                    <button id="sendBtn" type="submit">Send</button>
                 </form>
-
-                <!-- Button for sending location -->
-                <button id="send-location">send location</button>
+                <button id="sendLocation">
+                    <span id="shareSpan"> Share</span>
+                    <svg width="23" height="22" viewBox="0 0 39 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M19.9014 0C12.0138 0 5.59641 6.22448 5.59641 13.875C5.59641 21.0384 17.3416 34.8902 18.6815 36.4465C18.9835 36.7973 19.4301 37 19.9014 37C20.3726 37 20.8193 36.7973 21.1212 36.4465C22.4611 34.8902 34.2063 21.0384 34.2063 13.875C34.2063 6.22448 27.7889 0 19.9014 0ZM19.9014 33.0132C15.9452 28.1817 8.77528 18.4722 8.77528 13.875C8.77528 7.92417 13.7661 3.08333 19.9014 3.08333C26.0366 3.08333 31.0274 7.92417 31.0274 13.875C31.0274 18.4722 23.8575 28.1817 19.9014 33.0132Z"
+                            fill="#238CEE" />
+                        <path
+                            d="M19.9014 6.16663C15.5193 6.16663 11.9542 9.62458 11.9542 13.875C11.9542 18.1253 15.5193 21.5833 19.9014 21.5833C22.0614 21.5833 24.0816 20.757 25.59 19.2569C26.2027 18.6472 26.19 17.6713 25.5621 17.077C24.9335 16.4827 23.9274 16.4942 23.3147 17.104C22.4095 18.0043 21.1975 18.5 19.9014 18.5C17.2716 18.5 15.133 16.4256 15.133 13.875C15.133 11.3243 17.2716 9.24996 19.9014 9.24996C22.5311 9.24996 24.6697 11.3243 24.6697 13.875C24.6697 14.726 25.3817 15.4166 26.2591 15.4166C27.1365 15.4166 27.8485 14.726 27.8485 13.875C27.8485 9.62458 24.2834 6.16663 19.9014 6.16663Z"
+                            fill="#238CEE" />
+                    </svg>
+                </button>
+                <input type="file" id="fileInput" name="file" accept="image/*" />
+                <div class="put-on-top">
+                    <label id="fileLabel" for="fileInput">
+                        <svg id="imgUploadIcon" width="26" height="25" viewBox="0 0 26 25" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M23.0607 0H2.94066C1.31884 0 0 1.31841 0 2.94213V21.4337C0 23.0555 1.31884 24.3725 2.94066 24.3725H23.0606C24.6825 24.3725 25.9999 23.0555 25.9999 21.4337V2.94213C26 1.31841 24.6825 0 23.0607 0ZM16.8129 4.37552C18.3813 4.37552 19.6532 5.64753 19.6532 7.21582C19.6532 8.78411 18.3812 10.0561 16.8129 10.0561C15.2441 10.0561 13.9726 8.78411 13.9726 7.21582C13.9726 5.64753 15.2441 4.37552 16.8129 4.37552ZM22.1385 21.6542H12.9997H4.26811C3.48367 21.6542 3.13431 21.0867 3.48793 20.3865L8.36242 10.7317C8.71561 10.0316 9.38874 9.96909 9.86543 10.592L14.7669 16.9974C15.2436 17.6204 16.0768 17.6734 16.6282 17.1153L17.8273 15.9011C18.3783 15.3429 19.1902 15.412 19.6399 16.0544L22.7449 20.4896C23.1937 21.133 22.923 21.6542 22.1385 21.6542Z"
+                                fill="white" />
+                        </svg>
+                    </label>
+                    <button form="chattingForm" type="submit" id="sendBtn-mobile">
+                        <svg id="send-mobile-icon" width="26" height="26" viewBox="0 0 26 26" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M24.4516 10.3125L3.47412 0.224552C2.59038 -0.200483 1.59196 -0.0135075 0.868585 0.712266C0.145205 1.43816 -0.15735 2.5566 0.079088 3.63107L1.94627 12.1172H11.0882C11.5089 12.1172 11.85 12.5124 11.85 13C11.85 13.4876 11.5089 13.8829 11.0882 13.8829H1.94627L0.079088 22.3689C-0.15735 23.4435 0.145154 24.5619 0.868585 25.2877C1.59344 26.015 2.59195 26.1997 3.47417 25.7755L24.4516 15.6875C25.4067 15.2283 26 14.1985 26 13C26 11.8016 25.4067 10.7717 24.4516 10.3125Z"
+                                fill="white" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-
-
         </div>
     </div>
 
-    <!-- 
-    <h1> chat app</h1> -->
-    <!-- <button id="increment">+1</button> -->
-
-
-
-
-    <script id="message-template" type="text/html">
-        <div class="message">
-            <!-- <p>this is a message </p> -->
-
-            <p>
-                <span class="message__name">{{username}}</span>
-                <span class="message__meta"> {{createdAt}} </span>
-            </p>
-            <p> {{message}} </p>
-        </div>
-    </script>
-
-    <script id="location-template" type="text/html">
-        <div class="message">
-
-            <p>
-                <span class="message__name">{{username}}</span>
-                <span class="message__meta"> {{createdAt}} </span>
-            </p>
-            <p> <a href={{url}} target="_blank"> This is my location</a></p>
-        
-            
-        </div>
-    </script>
-
-    <script id='sidebar-template' type="text/html">
-        <h2 class="room-title">{{room}}</h2>
-        <h2 class="list-title">Users</h2>
-        <ul class="users">
-            {{#users}}
-                <li>{{username}}</li>
-            {{/users}}
-
-        </ul>
-
-    </script>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chat.js"></script>
+
+    <script src="./client-utils/compress.js"></script>
+    <script src="./client-utils/emoji library/emojiYassinLibrary.js"></script>
+    <script src="./js/chat.js"></script>
+    <audio id="sentSound" src="./client-utils/sounds/zapsplat_human_fart_47562.mp3"></audio>
+
 </body>
 
 </html>
